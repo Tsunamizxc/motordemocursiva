@@ -599,7 +599,8 @@ em { font-style: normal; font-weight: 700; }
   min-height: 100vh;
   min-height: 100dvh;
   display: grid;
-  align-items: end;
+  align-items: center;
+  justify-items: center;
   overflow: hidden;
   color: #fff;
 }
@@ -633,7 +634,7 @@ em { font-style: normal; font-weight: 700; }
   position: relative;
   z-index: 3;
   width: min(100% - 40px, var(--container));
-  margin: 0 auto 96px;
+  margin: 0 auto;
   max-width: 640px;
   text-align: center;
 }
@@ -2251,13 +2252,11 @@ em { font-style: normal; font-weight: 700; }
   }
   .car-card__spec { font-size: 10px; }
   .hero__content {
-    margin-bottom: 100px;
-    text-align: left;
-    margin-left: 16px;
-    margin-right: 16px;
-    width: auto;
+    margin: 0 auto;
+    text-align: center;
+    width: min(100% - 32px, var(--container));
   }
-  .hero__actions { justify-content: flex-start; }
-  .hero__subtitle { margin-left: 0; }
+  .hero__actions { justify-content: center; }
+  .hero__subtitle { margin-left: auto; margin-right: auto; }
   .hero__actions .btn { min-height: 44px; padding: 0 16px; font-size: 13px; }
 }
