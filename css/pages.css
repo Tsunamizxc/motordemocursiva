@@ -861,6 +861,25 @@
   font-family: var(--font-display);
   font-size: 20px;
 }
+.lead-form--row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items: start;
+  margin-top: 16px;
+}
+@media (max-width: 900px) {
+  .lead-form--row {
+    display: grid;
+    gap: 12px;
+    align-items: start;
+    margin-top: 16px;
+    grid-template-columns: 1fr;
+  }
+  .lead-form--row .btn {
+    width: 100%;
+  }
+}
 .equip-item {
   border-bottom: 1px solid var(--line);
 }

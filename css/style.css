@@ -2184,7 +2184,13 @@ em { font-style: normal; font-weight: 700; }
   .catalog .catalog-grid,
   #catalog .catalog-grid {
     display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: none;
+    touch-action: pan-x;
     scroll-snap-type: x mandatory;
     gap: 14px;
     padding: 4px 2px 12px;
@@ -2194,7 +2200,10 @@ em { font-style: normal; font-weight: 700; }
   .catalog .catalog-grid .car-card,
   #catalog .catalog-grid .car-card {
     flex: 0 0 min(82vw, 300px);
+    width: min(82vw, 300px);
+    max-width: min(82vw, 300px);
     scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
   .credit-strip__inner { flex-direction: column; align-items: flex-start; padding: 32px; }
   .credit-strip__car {
@@ -2212,7 +2221,13 @@ em { font-style: normal; font-weight: 700; }
   .catalog .catalog-grid,
   #catalog .catalog-grid {
     display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: none;
+    touch-action: pan-x;
     scroll-snap-type: x mandatory;
     gap: 14px;
     padding: 4px 2px 12px;
@@ -2222,7 +2237,10 @@ em { font-style: normal; font-weight: 700; }
   .catalog .catalog-grid .car-card,
   #catalog .catalog-grid .car-card {
     flex: 0 0 min(82vw, 300px);
+    width: min(82vw, 300px);
+    max-width: min(82vw, 300px);
     scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
   .catalog-home-cta .btn { width: 100%; }
   .offers-grid { grid-template-columns: 1fr; }
