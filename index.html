@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/pages.css" />
 </head>
@@ -278,8 +279,8 @@
         </div>
         <p class="section-lead" style="margin:-12px 0 28px">Подберите новый автомобиль официальных брендов холдинга или выберите проверенный вариант с пробегом.</p>
 
-        <div class="catalog-grid" id="catalogGrid">
-          
+        <div class="swiper catalog-swiper" id="catalogSwiper">
+          <div class="swiper-wrapper catalog-grid" id="catalogGrid"></div>
         </div>
       </div>
     </section>
@@ -649,6 +650,7 @@
 
   <div class="toast" id="toast" hidden>Заявка отправлена. Мы свяжемся с вами.</div>
 
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script src="js/site-common.js"></script>

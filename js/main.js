@@ -133,10 +133,41 @@ const cars = [
   const iconFuel = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 21V5a2 2 0 012-2h6a2 2 0 012 2v16M5 21h10M16 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
   const iconDrive = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M12 4v3M12 17v3M4 12h3M17 12h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
 
+  let catalogSwiper = null;
+
+  function initCatalogSwiper() {
+    const el = document.getElementById("catalogSwiper");
+    if (!el || typeof Swiper === "undefined") return;
+    if (catalogSwiper) {
+      catalogSwiper.destroy(true, true);
+      catalogSwiper = null;
+    }
+    catalogSwiper = new Swiper(el, {
+      slidesPerView: "auto",
+      spaceBetween: 14,
+      grabCursor: true,
+      watchOverflow: true,
+      touchAngle: 30,
+      threshold: 8,
+      touchReleaseOnEdges: true,
+      touchStartPreventDefault: false,
+      resistanceRatio: 0.65,
+      breakpoints: {
+        901: {
+          enabled: false,
+        },
+      },
+    });
+  }
+
   function renderCars(list) {
     const grid = document.getElementById("catalogGrid");
     if (!grid) return;
     if (!list.length) {
+      if (catalogSwiper) {
+        catalogSwiper.destroy(true, true);
+        catalogSwiper = null;
+      }
       grid.innerHTML = `
       <div class="catalog-empty reveal is-in">
         <img class="catalog-empty__car" src="assets/cars/car-profile.webp" alt="" />
@@ -147,6 +178,7 @@ const cars = [
     grid.innerHTML = list
       .map(
         (car) => `
+      <div class="swiper-slide catalog-slide">
       <article class="car-card reveal" data-brand="${car.brand}">
         <div class="car-card__media">
           <span class="car-card__badge"><img src="${car.logo}" alt="${car.brand}" /></span>
@@ -170,10 +202,12 @@ const cars = [
             </div>
           </div>
         </div>
-      </article>`
+      </article>
+      </div>`
       )
       .join("");
 
+    initCatalogSwiper();
     observeReveals();
     bindModalTriggers();
   }

@@ -826,6 +826,41 @@ em { font-style: normal; font-weight: 700; }
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
 }
+.catalog-swiper {
+  overflow: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0 0 4px;
+}
+.catalog-swiper .swiper-wrapper.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  box-sizing: border-box;
+}
+.catalog-swiper.swiper-initialized-false .swiper-wrapper.catalog-grid,
+.catalog-swiper:not(.swiper-initialized) .swiper-wrapper.catalog-grid {
+  transform: none !important;
+}
+.catalog-swiper .catalog-slide {
+  width: auto;
+  height: auto;
+  margin: 0 !important;
+}
+.catalog-swiper .catalog-slide .car-card {
+  height: 100%;
+}
+@media (max-width: 900px) {
+  .catalog-swiper .swiper-wrapper.catalog-grid {
+    display: flex;
+    gap: 0;
+  }
+  .catalog-swiper .catalog-slide {
+    width: min(82vw, 300px);
+    height: auto;
+    flex-shrink: 0;
+  }
+}
 .catalog-home-cta {
   display: flex;
   justify-content: flex-start;
@@ -2007,6 +2042,7 @@ em { font-style: normal; font-weight: 700; }
   .header-cta { padding: 0 12px; }
   .header-main__inner { gap: 12px; }
   .catalog-grid { grid-template-columns: repeat(3, 1fr); }
+  .catalog-swiper .swiper-wrapper.catalog-grid { grid-template-columns: repeat(3, 1fr); }
   .catalog-filters__row { grid-template-columns: repeat(2, 1fr); }
   .footer__grid { grid-template-columns: 1fr 1fr; }
   .header-top__inner { grid-template-columns: 1fr auto; }
@@ -2181,30 +2217,6 @@ em { font-style: normal; font-weight: 700; }
     will-change: background-position;
   }
   .catalog-grid { grid-template-columns: 1fr; gap: 14px; }
-  .catalog .catalog-grid,
-  #catalog .catalog-grid {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: stretch;
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
-    overscroll-behavior-y: none;
-    touch-action: pan-x;
-    scroll-snap-type: x mandatory;
-    gap: 14px;
-    padding: 4px 2px 12px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-  }
-  .catalog .catalog-grid .car-card,
-  #catalog .catalog-grid .car-card {
-    flex: 0 0 min(82vw, 300px);
-    width: min(82vw, 300px);
-    max-width: min(82vw, 300px);
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-  }
   .credit-strip__inner { flex-direction: column; align-items: flex-start; padding: 32px; }
   .credit-strip__car {
     right: -34px;
@@ -2218,30 +2230,6 @@ em { font-style: normal; font-weight: 700; }
   .header-mobile-info__hours { display: none; }
   .header-mobile-info__phone { font-size: 11px; }
   .catalog-filters__row { grid-template-columns: 1fr; }
-  .catalog .catalog-grid,
-  #catalog .catalog-grid {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: stretch;
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
-    overscroll-behavior-y: none;
-    touch-action: pan-x;
-    scroll-snap-type: x mandatory;
-    gap: 14px;
-    padding: 4px 2px 12px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-  }
-  .catalog .catalog-grid .car-card,
-  #catalog .catalog-grid .car-card {
-    flex: 0 0 min(82vw, 300px);
-    width: min(82vw, 300px);
-    max-width: min(82vw, 300px);
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-  }
   .catalog-home-cta .btn { width: 100%; }
   .offers-grid { grid-template-columns: 1fr; }
   .offer-card:nth-child(n) { grid-column: 1; }
