@@ -1,6 +1,9 @@
 (function () {
   "use strict";
-  const cars = window.ANTIKOR_CARS || [];
+  const cars = (window.ANTIKOR_CARS || []).map((car, index) => ({
+    ...car,
+    _index: index,
+  }));
   const grid = document.getElementById("catalogGrid");
   const countEl = document.getElementById("catalogCount");
   const footEl = document.getElementById("catalogFoot");
@@ -14,83 +17,109 @@
   const formatMileage = (n) =>
     n === 0 ? "Новый" : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " км";
 
+  const initialBrand = params.get("brand") || "";
+  const initialType = params.get("type") || "";
+
   const state = {
-    brand: params.get("brand") || "",
-    type: params.get("type") || "",
-    model: "",
-    body: "",
-    fuel: "",
-    transmission: "",
-    drive: "",
+    brands: initialBrand ? [initialBrand] : [],
+    types: initialType ? [initialType] : [],
+    bodies: [],
+    fuels: [],
+    transmissions: [],
+    drives: [],
     priceFrom: "",
     priceTo: "",
     yearFrom: "",
     yearTo: "",
     mileageTo: "",
     hpFrom: "",
+    sort: "price",
+    sortDir: "asc",
+    view: "grid",
     page: 1,
     accumulate: false,
   };
 
   let filtered = [];
-
   const $ = (id) => document.getElementById(id);
 
-  function fillSelect(id, values, placeholder) {
-    const el = $(id);
+  function countBy(key) {
+    const map = {};
+    cars.forEach((c) => {
+      const v = c[key];
+      if (!v && v !== 0) return;
+      map[v] = (map[v] || 0) + 1;
+    });
+    return map;
+  }
+
+  function uniqueSorted(key) {
+    return [...new Set(cars.map((c) => c[key]).filter(Boolean))].sort((a, b) =>
+      String(a).localeCompare(String(b), "ru")
+    );
+  }
+
+  function renderCheckList(containerId, values, name, selected, counts) {
+    const el = $(containerId);
     if (!el) return;
-    el.innerHTML =
-      `<option value="">${placeholder}</option>` +
-      values.map((v) => `<option value="${v}">${v}</option>`).join("");
+    el.innerHTML = values
+      .map((value) => {
+        const checked = selected.includes(value) ? " checked" : "";
+        const count = counts[value] || 0;
+        return `<label class="filter-check">
+          <input type="checkbox" name="${name}" value="${value}"${checked} />
+          <span>${value}</span>
+          <em>${count}</em>
+        </label>`;
+      })
+      .join("");
   }
 
-  function unique(key) {
-    return [...new Set(cars.map((c) => c[key]).filter(Boolean))].sort();
+  function buildFilterLists() {
+    const brandCounts = countBy("brand");
+    renderCheckList("fBrandList", uniqueSorted("brand"), "fBrand", state.brands, brandCounts);
+    renderCheckList("fBodyList", uniqueSorted("body"), "fBody", state.bodies, countBy("body"));
+    renderCheckList("fFuelList", uniqueSorted("fuel"), "fFuel", state.fuels, countBy("fuel"));
+    renderCheckList(
+      "fTransmissionList",
+      uniqueSorted("transmission"),
+      "fTransmission",
+      state.transmissions,
+      countBy("transmission")
+    );
+    renderCheckList("fDriveList", uniqueSorted("drive"), "fDrive", state.drives, countBy("drive"));
+
+    const typeCounts = countBy("type");
+    document.querySelectorAll("#fTypeList [data-count]").forEach((em) => {
+      em.textContent = typeCounts[em.dataset.count] || 0;
+    });
+    document.querySelectorAll('#fTypeList input[name="fType"]').forEach((input) => {
+      input.checked = state.types.includes(input.value);
+    });
   }
 
-  fillSelect("fBrand", unique("brand"), "Все марки");
-  fillSelect("fBody", unique("body"), "Любой");
-  fillSelect("fFuel", unique("fuel"), "Любой");
-  fillSelect("fTransmission", unique("transmission"), "Любая");
-  fillSelect("fDrive", unique("drive"), "Любой");
+  buildFilterLists();
 
-  function updateModels() {
-    const brand = $("fBrand")?.value || state.brand;
-    const models = [
-      ...new Set(
-        cars
-          .filter((c) => !brand || c.brand === brand)
-          .map((c) => c.model)
-      ),
-    ].sort();
-    fillSelect("fModel", models, "Все модели");
-  }
-  updateModels();
-
-  if (state.brand && $("fBrand")) $("fBrand").value = state.brand;
-  if (state.type && $("fType")) $("fType").value = state.type;
-
-  document.querySelectorAll(".brand-pill").forEach((pill) => {
-    const b = pill.dataset.brand || "";
-    if (b === state.brand) pill.classList.add("is-active");
-    pill.addEventListener("click", () => {
-      document.querySelectorAll(".brand-pill").forEach((p) => p.classList.remove("is-active"));
-      pill.classList.add("is-active");
-      state.brand = b;
-      if ($("fBrand")) $("fBrand").value = b;
-      updateModels();
-      applyFilters();
+  document.querySelectorAll(".filter-acc__head").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const acc = btn.closest(".filter-acc");
+      if (!acc) return;
+      const open = acc.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
     });
   });
 
+  function checkedValues(name) {
+    return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map((el) => el.value);
+  }
+
   function readFilters() {
-    state.brand = $("fBrand")?.value || "";
-    state.model = $("fModel")?.value || "";
-    state.body = $("fBody")?.value || "";
-    state.fuel = $("fFuel")?.value || "";
-    state.transmission = $("fTransmission")?.value || "";
-    state.drive = $("fDrive")?.value || "";
-    state.type = $("fType")?.value || state.type;
+    state.brands = checkedValues("fBrand");
+    state.types = checkedValues("fType");
+    state.bodies = checkedValues("fBody");
+    state.fuels = checkedValues("fFuel");
+    state.transmissions = checkedValues("fTransmission");
+    state.drives = checkedValues("fDrive");
     state.priceFrom = $("fPriceFrom")?.value || "";
     state.priceTo = $("fPriceTo")?.value || "";
     state.yearFrom = $("fYearFrom")?.value || "";
@@ -99,16 +128,46 @@
     state.hpFrom = $("fHpFrom")?.value || "";
   }
 
+  function sortList(list) {
+    const dir = state.sortDir === "desc" ? -1 : 1;
+    const sorted = [...list];
+    sorted.sort((a, b) => {
+      let av;
+      let bv;
+      switch (state.sort) {
+        case "date":
+          av = a._index;
+          bv = b._index;
+          break;
+        case "year":
+          av = a.year;
+          bv = b.year;
+          break;
+        case "mileage":
+          av = a.mileage;
+          bv = b.mileage;
+          break;
+        case "price":
+        default:
+          av = a.price;
+          bv = b.price;
+          break;
+      }
+      if (av === bv) return a._index - b._index;
+      return av > bv ? dir : -dir;
+    });
+    return sorted;
+  }
+
   function filterCars() {
     readFilters();
-    return cars.filter((c) => {
-      if (state.brand && c.brand !== state.brand) return false;
-      if (state.model && c.model !== state.model) return false;
-      if (state.body && c.body !== state.body) return false;
-      if (state.fuel && c.fuel !== state.fuel) return false;
-      if (state.transmission && c.transmission !== state.transmission) return false;
-      if (state.drive && c.drive !== state.drive) return false;
-      if (state.type && c.type !== state.type) return false;
+    const list = cars.filter((c) => {
+      if (state.brands.length && !state.brands.includes(c.brand)) return false;
+      if (state.types.length && !state.types.includes(c.type)) return false;
+      if (state.bodies.length && !state.bodies.includes(c.body)) return false;
+      if (state.fuels.length && !state.fuels.includes(c.fuel)) return false;
+      if (state.transmissions.length && !state.transmissions.includes(c.transmission)) return false;
+      if (state.drives.length && !state.drives.includes(c.drive)) return false;
       if (state.priceFrom && c.price < +state.priceFrom) return false;
       if (state.priceTo && c.price > +state.priceTo) return false;
       if (state.yearFrom && c.year < +state.yearFrom) return false;
@@ -117,6 +176,7 @@
       if (state.hpFrom && c.hp < +state.hpFrom) return false;
       return true;
     });
+    return sortList(list);
   }
 
   function totalPages() {
@@ -124,9 +184,7 @@
   }
 
   function visibleList() {
-    if (state.accumulate) {
-      return filtered.slice(0, state.page * PAGE_SIZE);
-    }
+    if (state.accumulate) return filtered.slice(0, state.page * PAGE_SIZE);
     const start = (state.page - 1) * PAGE_SIZE;
     return filtered.slice(start, start + PAGE_SIZE);
   }
@@ -152,8 +210,12 @@
             <div class="cat-card__spec"><strong>${c.fuel}</strong>топливо</div>
             <div class="cat-card__spec"><strong>${c.drive}</strong>привод</div>
           </div>
+          <div class="cat-card__meta">
+            <span>${formatMileage(c.mileage)}</span>
+            <span>${c.transmission}</span>
+          </div>
           <div class="cat-card__price">${formatPrice(c.price)}</div>
-          <span class="cat-card__credit">от ${formatPrice(c.credit).replace(" ₽", "")} ₽/мес. · ${formatMileage(c.mileage)}</span>
+          <span class="cat-card__credit">от ${formatPrice(c.credit).replace(" ₽", "")} ₽/мес.</span>
           <div class="car-card__actions">
             <button class="btn btn--accent" type="button" data-open-modal="credit" data-credit-price="${c.price}">Рассчитать кредит</button>
             <div class="car-card__links">
@@ -187,7 +249,6 @@
 
   function renderPager() {
     if (!pagerEl || !footEl || !moreBtn) return;
-
     const total = filtered.length;
     const pages = totalPages();
     const shown = shownCount();
@@ -220,13 +281,25 @@
     pagerEl.innerHTML = html;
   }
 
-  function render() {
-    const list = visibleList();
+  function updateToolbar() {
     if (countEl) {
-      countEl.textContent = filtered.length
-        ? `Найдено: ${filtered.length} · показано ${shownCount()}`
-        : "Найдено: 0";
+      countEl.innerHTML = `Найдено машин: <strong>${filtered.length}</strong>`;
     }
+    grid.dataset.view = state.view;
+    grid.classList.toggle("catalog-results--list", state.view === "list");
+    document.querySelectorAll(".catalog-view").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.view === state.view);
+    });
+    document.querySelectorAll(".catalog-sort").forEach((btn) => {
+      const active = btn.dataset.sort === state.sort;
+      btn.classList.toggle("is-active", active);
+      btn.dataset.dir = active ? state.sortDir : "";
+    });
+  }
+
+  function render() {
+    updateToolbar();
+    const list = visibleList();
 
     if (!filtered.length) {
       grid.innerHTML =
@@ -245,9 +318,7 @@
     state.page = Math.min(Math.max(1, page), pages);
     state.accumulate = accumulate;
     render();
-    if (scroll) {
-      grid.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    if (scroll) grid.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function applyFilters() {
@@ -255,19 +326,25 @@
     state.page = 1;
     state.accumulate = false;
     render();
+
     const url = new URL(location.href);
-    if (state.brand) url.searchParams.set("brand", state.brand);
+    if (state.brands.length === 1) url.searchParams.set("brand", state.brands[0]);
     else url.searchParams.delete("brand");
-    if (state.type) url.searchParams.set("type", state.type);
+    if (state.types.length === 1) url.searchParams.set("type", state.types[0]);
     else url.searchParams.delete("type");
     history.replaceState(null, "", url);
   }
 
+  document.getElementById("filtersPanel")?.addEventListener("change", (e) => {
+    if (e.target.matches('input[type="checkbox"], input[type="number"]')) applyFilters();
+  });
+  document.getElementById("filtersPanel")?.addEventListener("input", (e) => {
+    if (e.target.matches('input[type="number"]')) applyFilters();
+  });
+
   moreBtn?.addEventListener("click", () => {
     if (shownCount() >= filtered.length) return;
-    if (!state.accumulate) {
-      state.accumulate = true;
-    }
+    if (!state.accumulate) state.accumulate = true;
     state.page += 1;
     render();
   });
@@ -286,45 +363,41 @@
     goToPage(next, { accumulate: false, scroll: true });
   });
 
-  $("fBrand")?.addEventListener("change", () => {
-    state.brand = $("fBrand").value;
-    document.querySelectorAll(".brand-pill").forEach((p) => {
-      p.classList.toggle("is-active", (p.dataset.brand || "") === state.brand);
+  document.querySelectorAll(".catalog-sort").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.sort;
+      if (state.sort === key) {
+        state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+      } else {
+        state.sort = key;
+        state.sortDir = key === "date" ? "desc" : "asc";
+      }
+      applyFilters();
     });
-    updateModels();
-    applyFilters();
   });
 
-  [
-    "fModel",
-    "fBody",
-    "fFuel",
-    "fTransmission",
-    "fDrive",
-    "fType",
-    "fPriceFrom",
-    "fPriceTo",
-    "fYearFrom",
-    "fYearTo",
-    "fMileageTo",
-    "fHpFrom",
-  ].forEach((id) => {
-    $(id)?.addEventListener("change", applyFilters);
-    $(id)?.addEventListener("input", applyFilters);
+  document.querySelectorAll(".catalog-view").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.view = btn.dataset.view || "grid";
+      updateToolbar();
+    });
   });
 
   $("fReset")?.addEventListener("click", () => {
-    ["fBrand", "fModel", "fBody", "fFuel", "fTransmission", "fDrive", "fType"].forEach((id) => {
-      if ($(id)) $(id).value = "";
+    document.querySelectorAll('#filtersPanel input[type="checkbox"]').forEach((el) => {
+      el.checked = false;
     });
     ["fPriceFrom", "fPriceTo", "fYearFrom", "fYearTo", "fMileageTo", "fHpFrom"].forEach((id) => {
       if ($(id)) $(id).value = "";
     });
-    state.type = "";
-    state.brand = "";
-    document.querySelectorAll(".brand-pill").forEach((p) => p.classList.remove("is-active"));
-    document.querySelector('.brand-pill[data-brand=""]')?.classList.add("is-active");
-    updateModels();
+    state.brands = [];
+    state.types = [];
+    state.bodies = [];
+    state.fuels = [];
+    state.transmissions = [];
+    state.drives = [];
+    state.sort = "price";
+    state.sortDir = "asc";
     applyFilters();
   });
 
