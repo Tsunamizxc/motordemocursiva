@@ -827,7 +827,7 @@ em { font-style: normal; font-weight: 700; }
   gap: 18px;
 }
 .catalog-swiper {
-  overflow: hidden;
+  overflow: visible;
   width: 100%;
   margin: 0;
   padding: 0 0 8px;
@@ -854,6 +854,9 @@ em { font-style: normal; font-weight: 700; }
   transform: none;
 }
 @media (max-width: 900px) {
+  .catalog-swiper {
+    overflow: hidden;
+  }
   .catalog-swiper .swiper-wrapper.catalog-grid {
     display: flex;
     gap: 0;
@@ -863,6 +866,17 @@ em { font-style: normal; font-weight: 700; }
     height: auto;
     flex-shrink: 0;
     box-sizing: border-box;
+  }
+  .catalog-swiper .car-card,
+  .catalog-swiper .car-card:hover,
+  .catalog-swiper .car-card:active {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--line);
+  }
+  .catalog-swiper .car-card:hover .car-card__media img,
+  .catalog-swiper .car-card:active .car-card__media img {
+    transform: none;
   }
 }
 .catalog-home-cta {
