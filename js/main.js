@@ -145,13 +145,9 @@ const cars = [
     catalogSwiper = new Swiper(el, {
       slidesPerView: "auto",
       spaceBetween: 14,
+      cssMode: true,
       grabCursor: true,
       watchOverflow: true,
-      touchAngle: 30,
-      threshold: 8,
-      touchReleaseOnEdges: true,
-      touchStartPreventDefault: false,
-      resistanceRatio: 0.65,
       breakpoints: {
         901: {
           enabled: false,
@@ -179,7 +175,7 @@ const cars = [
       .map(
         (car) => `
       <div class="swiper-slide catalog-slide">
-      <article class="car-card reveal" data-brand="${car.brand}">
+      <article class="car-card" data-brand="${car.brand}">
         <div class="car-card__media">
           <span class="car-card__badge"><img src="${car.logo}" alt="${car.brand}" /></span>
           <img src="${car.img}" alt="${car.brand} ${car.model}" loading="lazy" />
@@ -208,7 +204,6 @@ const cars = [
       .join("");
 
     initCatalogSwiper();
-    observeReveals();
     bindModalTriggers();
   }
 const header = document.getElementById("siteHeader");

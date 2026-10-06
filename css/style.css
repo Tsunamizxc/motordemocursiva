@@ -830,7 +830,7 @@ em { font-style: normal; font-weight: 700; }
   overflow: hidden;
   width: 100%;
   margin: 0;
-  padding: 0 0 4px;
+  padding: 0 0 8px;
 }
 .catalog-swiper .swiper-wrapper.catalog-grid {
   display: grid;
@@ -845,10 +845,13 @@ em { font-style: normal; font-weight: 700; }
 .catalog-swiper .catalog-slide {
   width: auto;
   height: auto;
-  margin: 0 !important;
 }
 .catalog-swiper .catalog-slide .car-card {
   height: 100%;
+}
+.catalog-swiper .car-card.reveal {
+  opacity: 1;
+  transform: none;
 }
 @media (max-width: 900px) {
   .catalog-swiper .swiper-wrapper.catalog-grid {
@@ -859,6 +862,7 @@ em { font-style: normal; font-weight: 700; }
     width: min(82vw, 300px);
     height: auto;
     flex-shrink: 0;
+    box-sizing: border-box;
   }
 }
 .catalog-home-cta {
